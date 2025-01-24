@@ -24,7 +24,7 @@ pub fn generate_keys() -> Keys {
 
 }
 
-pub fn encrypt(data: &[u8], keys: &mut Keys) -> Vec<u8>{
+pub fn encrypt(data: &[u8], keys: &mut Keys) -> Result<Vec<u8>, rsa::Error>{
     keys.public.encrypt(&mut keys.rng, rsa::Pkcs1v15Encrypt, data)
-    .expect("Failed to encrypt data")
+    
 }

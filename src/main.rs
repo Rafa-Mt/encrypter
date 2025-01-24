@@ -1,16 +1,32 @@
-use::rsa::{pkcs1::{EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt};
+use::rsa::{pkcs1::{EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, };
+use std::{fs, io::{Read, Write}};
 
 mod rsa;
 
 fn main() {
-    let mut keys = rsa::generate_keys();
-    let data = b"Hello, World!";
-    let encrypted = rsa::encrypt(data, &mut keys);
-    // println!("Encrypted: {:?}", encrypted);
-    // println!("Private: {:?}", keys.private.to_pkcs1_pem(LineEnding::LF).unwrap());
-    // println!("Public: {:?}", keys.public.to_pkcs1_pem(LineEnding::LF).unwrap());
-
-    let decrypted = keys.private.decrypt(Pkcs1v15Encrypt, &encrypted)
-    .expect("Failed to decrypt data");
-    println!("Decrypted: {:?}", String::from_utf8(decrypted).unwrap());
+    print!("Main function");
 }
+
+
+fn save(encrypted: &Vec<u8>, keys: &rsa::Keys) {
+    let _ = fs::create_dir("out");
+
+    fs::File::create("out/out.cif")
+        .expect("Failed to create digest file")
+        .write(&encrypted)
+        .expect("Failed to write data to file");
+
+    fs::File::create("out/private.pem")
+        .expect("Failed to create private key file")
+        .write(keys.private.to_pkcs1_pem(LineEnding::LF).unwrap().as_bytes())
+        .expect("Failed to write private key to file");
+
+    fs::File::create("out/public.pem")
+        .expect("Failed to create public key file")
+        .write(keys.public.to_pkcs1_pem(LineEnding::LF).unwrap().as_bytes())
+        .expect("Failed to write public key to file");
+}
+
+
+#[cfg(test)]
+mod tests;
