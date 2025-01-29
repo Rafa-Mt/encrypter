@@ -1,30 +1,70 @@
-use::rsa::{pkcs1::{EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, };
+use args::{parse_args, Action};
+use rsa::pkcs1::DecodeRsaPrivateKey;
+use::rsa::{pkcs1::{DecodeRsaPublicKey, EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey };
 use std::{fs, io::{Read, Write}};
 
-mod rsa;
+mod args;
 
 fn main() {
-    print!("Main function");
+    let args = parse_args();
+    let target_buffer = args.target.as_bytes();
+
+    let data = match args.action.clone() {
+        Action::Encrypt (keystring) => Some(encrypt(keystring, target_buffer)),
+        Action::Decrypt (keystring) => Some(decrypt(keystring, target_buffer)),
+        Action::CreateKeys => {
+            create_keys(args.target);
+            None
+        },
+    };
+
+    match data {
+        None => {},
+        Some(data) => {
+            let file_extension = match args.action.clone() {
+                Action::Encrypt(_) => "cif",
+                Action::Decrypt(_) => "txt",
+                Action::CreateKeys => panic!("How.")
+            };
+
+            fs::File::create(format!("./out.{file_extension}"))
+                .expect("Failed to create output file")
+                .write(&data)
+                .expect("Failed to write output file");
+        }
+    }
 }
 
+fn encrypt(keystring: String, target_buffer: &[u8]) -> Vec<u8> {
+    let public_key = RsaPublicKey::read_pkcs1_pem_file(&keystring)
+    .expect("Failed to read public key");
 
-fn save(encrypted: &Vec<u8>, keys: &rsa::Keys) {
-    let _ = fs::create_dir("out");
+    let mut rng = rand::thread_rng();
 
-    fs::File::create("out/out.cif")
-        .expect("Failed to create digest file")
-        .write(&encrypted)
-        .expect("Failed to write data to file");
+    public_key.encrypt(&mut rng, Pkcs1v15Encrypt, target_buffer)
+        .expect("Failed to encrypt")
+}
 
-    fs::File::create("out/private.pem")
-        .expect("Failed to create private key file")
-        .write(keys.private.to_pkcs1_pem(LineEnding::LF).unwrap().as_bytes())
-        .expect("Failed to write private key to file");
+fn decrypt(keystring: String, target_buffer: &[u8]) -> Vec<u8> {
+    let private_key = RsaPrivateKey::read_pkcs1_pem_file(&keystring)
+        .expect("Failed to read private key");  
 
-    fs::File::create("out/public.pem")
-        .expect("Failed to create public key file")
-        .write(keys.public.to_pkcs1_pem(LineEnding::LF).unwrap().as_bytes())
-        .expect("Failed to write public key to file");
+    private_key.decrypt(Pkcs1v15Encrypt, target_buffer)
+        .expect("Failed to decrypt")
+}
+
+fn create_keys(target: String) {
+    let mut rng = rand::thread_rng();
+    let private_key = RsaPrivateKey::new(&mut rng, 2048)
+        .expect("Failed to generate private key");
+
+    let public_key = private_key.to_public_key();
+
+    public_key.write_pkcs1_pem_file(format!("{target}/public.pem"), LineEnding::LF)
+        .expect("Failed to create public key file");
+
+    private_key.write_pkcs1_pem_file(format!("{target}/private.pem"), LineEnding::LF)
+        .expect("Failed to create private key file");
 }
 
 
