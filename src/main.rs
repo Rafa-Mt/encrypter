@@ -1,7 +1,7 @@
 use args::{parse_args, Action};
 use rsa::pkcs1::DecodeRsaPrivateKey;
 use::rsa::{pkcs1::{DecodeRsaPublicKey, EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey };
-use std::{fs, io::{Read, Write}};
+use std::{fs, io::Write};
 
 mod args;
 

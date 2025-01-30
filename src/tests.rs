@@ -1,3 +1,5 @@
+use std::io::Read;
+
 use super::*;
 extern crate rsa;
 use rsa::{pkcs1::{DecodeRsaPrivateKey, DecodeRsaPublicKey}, Pkcs1v15Encrypt, RsaPublicKey}; 
