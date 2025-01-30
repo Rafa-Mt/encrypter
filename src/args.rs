@@ -37,3 +37,22 @@ pub fn parse_args() -> Result<Args, &'static str> {
         target: String::from(target.unwrap())
     })
 }
+
+pub fn get_usage_message() -> String {
+    String::from(r#"
+    Usage: encrypter [action] [target] [keyfile]
+
+    actions:
+        -d: Decrypt file 
+        -e: Encrypt file
+        -c: Generate public and private keys
+
+    target:
+        For Encryption and Decryption: file to encrypt/decrypt directory (Output goes to ./)
+        For Key Generation: output directory
+
+    keyfile:
+        Public/Private key directory
+        (Only used in encryption and decryption)
+    "#)
+}

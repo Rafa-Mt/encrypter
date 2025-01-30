@@ -1,13 +1,13 @@
-use args::{parse_args, Action};
 use rsa::pkcs1::DecodeRsaPrivateKey;
 use::rsa::{pkcs1::{DecodeRsaPublicKey, EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey };
 use std::{fs, io::Write};
 
 mod args;
+use args::Action;
 
 fn main() {
-    let args = parse_args()
-        .expect("Failed to parse arguments");
+    let args = args::parse_args()
+        .expect(&args::get_usage_message());
 
     let target_buffer = args.target.as_bytes();
 
