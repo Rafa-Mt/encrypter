@@ -6,7 +6,9 @@ use std::{fs, io::{Read, Write}};
 mod args;
 
 fn main() {
-    let args = parse_args();
+    let args = parse_args()
+        .expect("Failed to parse arguments");
+
     let target_buffer = args.target.as_bytes();
 
     let data = match args.action.clone() {
