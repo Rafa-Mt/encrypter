@@ -43,3 +43,11 @@ fn file_reading_encrypt() {
     println!("pubkey: {}\nfile: {}", public_key.to_pkcs1_pem(LineEnding::LF).unwrap(), file_to_encrypt);
 }
 
+#[test]
+fn full_process_no_save() {
+    let target_buffer = b"Hello, World!";
+    let encrypted = encrypt("./public.pem", target_buffer);
+    let decrypted = decrypt("./private.pem", &encrypted);
+
+    assert_eq!(target_buffer, decrypted.as_slice());
+}

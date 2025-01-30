@@ -1,5 +1,4 @@
-use rsa::pkcs1::DecodeRsaPrivateKey;
-use::rsa::{pkcs1::{DecodeRsaPublicKey, EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey };
+use::rsa::{pkcs1::{DecodeRsaPublicKey, DecodeRsaPrivateKey, EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey };
 use std::{fs, io::Write};
 
 mod args;
@@ -24,14 +23,14 @@ fn main() {
         None => {},
         Some(data) => {
             let file_extension = match args.action.clone() {
-                Action::Encrypt(_) => "cif",
+                Action::Encrypt(_) => "bin",
                 Action::Decrypt(_) => "txt",
                 Action::CreateKeys => panic!("How.")
             };
 
             fs::File::create(format!("./out.{file_extension}"))
                 .expect("Failed to create output file")
-                .write(&data)
+                .write_all(&data)
                 .expect("Failed to write output file");
         }
     }
@@ -50,6 +49,8 @@ fn encrypt(keystring: &str, target_buffer: &[u8]) -> Vec<u8> {
 fn decrypt(keystring: &str, target_buffer: &[u8]) -> Vec<u8> {
     let private_key = RsaPrivateKey::read_pkcs1_pem_file(keystring)
         .expect("Failed to read private key");  
+
+    // println!("{:?}", private_key.to_pkcs1_pem(LineEnding::LF).unwrap());
 
     private_key.decrypt(Pkcs1v15Encrypt, target_buffer)
         .expect("Failed to decrypt")
