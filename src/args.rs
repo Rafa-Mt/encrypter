@@ -49,7 +49,7 @@ pub fn get_usage_message() -> String {
 
     target:
         For Encryption and Decryption: file to encrypt/decrypt directory (Output goes to ./)
-        For Key Generation: output directory
+        For Key Generation: output directory (if same directory use ".")
 
     keyfile:
         Public/Private key directory

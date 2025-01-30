@@ -12,10 +12,10 @@ fn main() {
     let target_buffer = args.target.as_bytes();
 
     let data = match args.action.clone() {
-        Action::Encrypt (keystring) => Some(encrypt(keystring, target_buffer)),
-        Action::Decrypt (keystring) => Some(decrypt(keystring, target_buffer)),
+        Action::Encrypt (keystring) => Some(encrypt(&keystring, target_buffer)),
+        Action::Decrypt (keystring) => Some(decrypt(&keystring, target_buffer)),
         Action::CreateKeys => {
-            create_keys(args.target);
+            create_keys(&args.target);
             None
         },
     };
@@ -37,7 +37,7 @@ fn main() {
     }
 }
 
-fn encrypt(keystring: String, target_buffer: &[u8]) -> Vec<u8> {
+fn encrypt(keystring: &str, target_buffer: &[u8]) -> Vec<u8> {
     let public_key = RsaPublicKey::read_pkcs1_pem_file(&keystring)
     .expect("Failed to read public key");
 
@@ -47,15 +47,15 @@ fn encrypt(keystring: String, target_buffer: &[u8]) -> Vec<u8> {
         .expect("Failed to encrypt")
 }
 
-fn decrypt(keystring: String, target_buffer: &[u8]) -> Vec<u8> {
-    let private_key = RsaPrivateKey::read_pkcs1_pem_file(&keystring)
+fn decrypt(keystring: &str, target_buffer: &[u8]) -> Vec<u8> {
+    let private_key = RsaPrivateKey::read_pkcs1_pem_file(keystring)
         .expect("Failed to read private key");  
 
     private_key.decrypt(Pkcs1v15Encrypt, target_buffer)
         .expect("Failed to decrypt")
 }
 
-fn create_keys(target: String) {
+fn create_keys(target: &str) {
     let mut rng = rand::thread_rng();
     let private_key = RsaPrivateKey::new(&mut rng, 2048)
         .expect("Failed to generate private key");
