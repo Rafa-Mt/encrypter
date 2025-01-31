@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, fs::{self, read}, io::Read};
 
 #[derive(Clone, Debug)]
 pub enum Action {
@@ -21,9 +21,13 @@ pub fn parse_args() -> Result<Args, &'static str> {
     let target = args.get(2);
     let keyfile = args.get(3);
 
+
     if actionstring == None || target == None {
         return Err("Invalid arguments");
     }
+
+
+
 
     let action = match &actionstring.unwrap().to_ascii_lowercase()[..] {
         "-e" => Action::Encrypt(String::from(keyfile.unwrap())), 
@@ -56,3 +60,5 @@ pub fn get_usage_message() -> String {
         (Only used in encryption and decryption)
     "#)
 }
+
+
