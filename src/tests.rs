@@ -3,7 +3,7 @@ use std::io::Read;
 use super::*;
 extern crate rsa;
 use rsa::{pkcs1::{DecodeRsaPrivateKey, DecodeRsaPublicKey}, Pkcs1v15Encrypt, RsaPublicKey}; 
-/* 
+
 
 #[test]
 fn file_reading_decrypt() {
@@ -41,7 +41,7 @@ fn file_reading_encrypt() {
         .expect("Failed to read target file");
 
     println!("pubkey: {}\nfile: {}", public_key.to_pkcs1_pem(LineEnding::LF).unwrap(), file_to_encrypt);
-} */
+}
 
 #[test]
 fn full_process_no_save() {
