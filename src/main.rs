@@ -43,7 +43,7 @@ fn encrypt(keystring: &str, file_path: &String) -> Vec<u8> {
 
     println!("path: {}", file_path);
     
-    let content = read_file_1(&file_path);
+    let content = read_file_to_bytes(&file_path);
     let target_buffer = content.as_slice();
 
 
@@ -61,7 +61,7 @@ fn decrypt(keystring: &str, file_path: &String) -> Vec<u8> {
     let private_key = RsaPrivateKey::read_pkcs1_pem_file(keystring)
         .expect("Failed to read private key");  
 
-    let content = read_file_1(&file_path);
+    let content = read_file_to_bytes(&file_path);
     let target_buffer = content.as_slice();
 
     
@@ -87,7 +87,7 @@ fn create_keys(target: &str) {
         .expect("Failed to create private key file");
 }
 
-fn read_file_1(file_path: &str) -> Vec<u8> {
+fn read_file_to_bytes(file_path: &str) -> Vec<u8> {
     let mut file = fs::File::open(file_path)
         .expect("Failed to open file");
 
