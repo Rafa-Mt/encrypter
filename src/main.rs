@@ -9,11 +9,15 @@ fn main() {
         .expect(&args::get_usage_message());
 
 
-
+    let buffer = if args.action != Action::CreateKeys {
+        Some(read_file_to_bytes(&args.target))
+    } else {
+        None
+    };
 
     let data = match args.action.clone() {
-        Action::Encrypt (keystring) =>Some(encrypt(&keystring, &args.target)),
-        Action::Decrypt (keystring) => Some(decrypt(&keystring, &args.target)),
+        Action::Encrypt (keystring) =>Some(encrypt(&keystring, &buffer.unwrap().as_slice())),
+        Action::Decrypt (keystring) => Some(decrypt(&keystring, &buffer.unwrap().as_slice())),
         Action::CreateKeys => {
             create_keys(&args.target);
             None
@@ -37,34 +41,24 @@ fn main() {
     }
 }
 
-fn encrypt(keystring: &str, file_path: &String) -> Vec<u8> {
+fn encrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
     let public_key = RsaPublicKey::read_pkcs1_pem_file(&keystring)
     .expect("Failed to read public key");
-
-    println!("path: {}", file_path);
-    
-    let content = read_file_to_bytes(&file_path);
-    let target_buffer = content.as_slice();
-
-
     
 
     let mut rng = rand::thread_rng();
 
-    public_key.encrypt(&mut rng, Pkcs1v15Encrypt, target_buffer)
+    public_key.encrypt(&mut rng, Pkcs1v15Encrypt, buffer)
         .expect("Failed to encrypt")
 
     
 }
 
-fn decrypt(keystring: &str, file_path: &String) -> Vec<u8> {
+fn decrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
     let private_key = RsaPrivateKey::read_pkcs1_pem_file(keystring)
         .expect("Failed to read private key");  
-
-    let content = read_file_to_bytes(&file_path);
-    let target_buffer = content.as_slice();
     
-    private_key.decrypt(Pkcs1v15Encrypt, target_buffer)
+    private_key.decrypt(Pkcs1v15Encrypt, buffer)
         .expect("Failed to decrypt")
 }
 
@@ -84,10 +78,8 @@ fn create_keys(target: &str) {
 }
 
 fn read_file_to_bytes(file_path: &str) -> Vec<u8> {
-    // Normaliza la ruta del archivo
     let path = Path::new(file_path);
 
-    // Abre el archivo
     let mut file = fs::File::open(path)
         .expect("Failed to open file");
 
