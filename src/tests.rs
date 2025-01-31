@@ -60,8 +60,5 @@ fn full_process_no_save() {
     let encrypted = encrypt(&public_key_path, &file_path);
     let decrypted = decrypt(&private_key_path, &encrypted_file_path);
 
-    println!("Decrypted: {:?}", String::from_utf8(decrypted).unwrap());
-    println!("Encrypted: {:?}", String::from_utf8(encrypted).unwrap());
-
 
 }

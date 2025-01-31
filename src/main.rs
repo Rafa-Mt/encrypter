@@ -1,5 +1,5 @@
 use::rsa::{pkcs1::{DecodeRsaPublicKey, DecodeRsaPrivateKey, EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey };
-use std::{fs, io::{Read, Write}};
+use std::{fs, io::{Read, Write}, path::Path};
 
 mod args;
 use args::Action;
@@ -63,11 +63,7 @@ fn decrypt(keystring: &str, file_path: &String) -> Vec<u8> {
 
     let content = read_file_to_bytes(&file_path);
     let target_buffer = content.as_slice();
-
     
-
-    // println!("{:?}", private_key.to_pkcs1_pem(LineEnding::LF).unwrap());
-
     private_key.decrypt(Pkcs1v15Encrypt, target_buffer)
         .expect("Failed to decrypt")
 }
@@ -88,14 +84,17 @@ fn create_keys(target: &str) {
 }
 
 fn read_file_to_bytes(file_path: &str) -> Vec<u8> {
-    let mut file = fs::File::open(file_path)
+    // Normaliza la ruta del archivo
+    let path = Path::new(file_path);
+
+    // Abre el archivo
+    let mut file = fs::File::open(path)
         .expect("Failed to open file");
 
     let mut buffer = Vec::new();
 
     file.read_to_end(&mut buffer)
         .expect("Failed to read file");
-
 
     buffer
 }
