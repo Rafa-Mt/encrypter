@@ -1,4 +1,6 @@
 /target
 /out
-.bin
-.pem
+*.bin
+*.pem
+*.exe
+*.txt

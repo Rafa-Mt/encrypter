@@ -8,7 +8,6 @@ fn main() {
     let args = args::parse_args()
         .expect(&args::get_usage_message());
 
-
     let buffer = if args.action != Action::CreateKeys {
         Some(read_file_to_bytes(&args.target))
     } else {
@@ -44,14 +43,11 @@ fn main() {
 fn encrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
     let public_key = RsaPublicKey::read_pkcs1_pem_file(&keystring)
     .expect("Failed to read public key");
-    
 
     let mut rng = rand::thread_rng();
 
     public_key.encrypt(&mut rng, Pkcs1v15Encrypt, buffer)
         .expect("Failed to encrypt")
-
-    
 }
 
 fn decrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
@@ -66,7 +62,6 @@ fn create_keys(target: &str) {
     let mut rng = rand::thread_rng();
     let private_key = RsaPrivateKey::new(&mut rng, 2048)
         .expect("Failed to generate private key");
-
 
     let public_key = private_key.to_public_key();
 
