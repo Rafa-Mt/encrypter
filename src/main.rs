@@ -1,5 +1,5 @@
 use::rsa::{pkcs1::{DecodeRsaPublicKey, DecodeRsaPrivateKey, EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey };
-use std::{fs, io::Write};
+use std::{fs, io::{Read, Write}, path::Path};
 
 mod args;
 use args::Action;
@@ -8,11 +8,16 @@ fn main() {
     let args = args::parse_args()
         .expect(&args::get_usage_message());
 
-    let target_buffer = args.target.as_bytes();
+
+    let buffer = if args.action != Action::CreateKeys {
+        Some(read_file_to_bytes(&args.target))
+    } else {
+        None
+    };
 
     let data = match args.action.clone() {
-        Action::Encrypt (keystring) => Some(encrypt(&keystring, target_buffer)),
-        Action::Decrypt (keystring) => Some(decrypt(&keystring, target_buffer)),
+        Action::Encrypt (keystring) =>Some(encrypt(&keystring, &buffer.unwrap().as_slice())),
+        Action::Decrypt (keystring) => Some(decrypt(&keystring, &buffer.unwrap().as_slice())),
         Action::CreateKeys => {
             create_keys(&args.target);
             None
@@ -36,23 +41,24 @@ fn main() {
     }
 }
 
-fn encrypt(keystring: &str, target_buffer: &[u8]) -> Vec<u8> {
+fn encrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
     let public_key = RsaPublicKey::read_pkcs1_pem_file(&keystring)
     .expect("Failed to read public key");
+    
 
     let mut rng = rand::thread_rng();
 
-    public_key.encrypt(&mut rng, Pkcs1v15Encrypt, target_buffer)
+    public_key.encrypt(&mut rng, Pkcs1v15Encrypt, buffer)
         .expect("Failed to encrypt")
+
+    
 }
 
-fn decrypt(keystring: &str, target_buffer: &[u8]) -> Vec<u8> {
+fn decrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
     let private_key = RsaPrivateKey::read_pkcs1_pem_file(keystring)
         .expect("Failed to read private key");  
-
-    // println!("{:?}", private_key.to_pkcs1_pem(LineEnding::LF).unwrap());
-
-    private_key.decrypt(Pkcs1v15Encrypt, target_buffer)
+    
+    private_key.decrypt(Pkcs1v15Encrypt, buffer)
         .expect("Failed to decrypt")
 }
 
@@ -60,6 +66,7 @@ fn create_keys(target: &str) {
     let mut rng = rand::thread_rng();
     let private_key = RsaPrivateKey::new(&mut rng, 2048)
         .expect("Failed to generate private key");
+
 
     let public_key = private_key.to_public_key();
 
@@ -70,6 +77,19 @@ fn create_keys(target: &str) {
         .expect("Failed to create private key file");
 }
 
+fn read_file_to_bytes(file_path: &str) -> Vec<u8> {
+    let path = Path::new(file_path);
+
+    let mut file = fs::File::open(path)
+        .expect("Failed to open file");
+
+    let mut buffer = Vec::new();
+
+    file.read_to_end(&mut buffer)
+        .expect("Failed to read file");
+
+    buffer
+}
 
 #[cfg(test)]
 mod tests;
