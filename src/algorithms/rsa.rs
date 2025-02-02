@@ -7,19 +7,19 @@ use::rsa::{
 };
 use rand;
 
-pub struct Keys {
+pub struct RsaKeys {
     public: RsaPublicKey,
     private: RsaPrivateKey
 }
 
-impl Keys {
-    pub fn new() -> Keys {
+impl RsaKeys {
+    pub fn new() -> RsaKeys {
         let mut rng = rand::thread_rng();
         let private = RsaPrivateKey::new(&mut rng, 2048)
             .expect("Failed to generate private key");
     
         let public = private.to_public_key();
-        Keys {
+        RsaKeys {
             public,
             private
         }
@@ -43,7 +43,7 @@ impl Keys {
     }
 }
 
-impl Debug for Keys {
+impl Debug for RsaKeys {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "Keys {{ \npublic: {:?}, \nprivate: {:?} \n}}", self.public.to_pkcs1_pem(LineEnding::LF), self.private.to_pkcs1_pem(LineEnding::LF))
     }
