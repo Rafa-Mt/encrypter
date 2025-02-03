@@ -1,6 +1,6 @@
 ## Usage
 ```bash
-$ ./encrypter [action] [target] [keyfile]
+$ ./encrypter [action] [target] [keyfile(s)]
 ```
 
 ## Arguments
@@ -13,14 +13,15 @@ $ ./encrypter [action] [target] [keyfile]
  * **For Encryption and Decryption:** File to encrypt/decrypt directory (Output goes to `./`)
  * **For Key Generation:** Output directory (if same directory use `.`)
 
-`[Keyfile]`:  
- * **Public/Private Key** directory _(Unused in key generation)_
+`[Keyfile(s)]`:  
+ * **Public/Private RSA Key** directory _(Unused in key generation)_
+ * **Encrypted AES Key** directory _(only used in decription)_
 
 ## Notes
  * Encryption method is `RSA`.
- * Keyfiles must be `.pem` files, following the `pkcs1` standard.
+ * RSA Keyfiles must be `.pem` files, following the `pkcs1` standard.
  * Keyfiles follow the `LF` line ending pattern.
- * Encrypted output is a `.bin` file, but the program theoretically decrypt any type of binary file. 
+ * Encrypted output is a `.bin` or `.enc` file, but the program theoretically decrypt any type of binary file. 
 
 ## Examples
 
@@ -36,5 +37,5 @@ $ ./encrypter [action] [target] [keyfile]
 
 * Decryption
     ```bash
-    $ ./encrypter -d ./encrypted_text.bin ./private_key.pem
+    $ ./encrypter -d ./encrypted_text.bin ./private_key.pem ./aes_key.bin
     ```
