@@ -2,10 +2,9 @@ use::rsa::{pkcs1::{DecodeRsaPublicKey, DecodeRsaPrivateKey, EncodeRsaPrivateKey,
 use std::{fs, io::{Read, Write}, path::Path};
 
 mod args;
-use args::Action;
 
 fn main() {
-    let args = args::parse_args()
+/*     let args = args::parse_args()
         .expect(&args::get_usage_message());
 
 
@@ -38,7 +37,7 @@ fn main() {
                 .write_all(&data)
                 .expect("Failed to write output file");
         }
-    }
+    } */
 }
 
 fn encrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
