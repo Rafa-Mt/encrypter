@@ -22,31 +22,9 @@ fn full_rsa() {
     assert_eq!(message, decrypted.as_slice());
 }
 
-#[test]
-fn aes_no_save() {
-    use algorithms::aes;
-    let key = aes::generate_key();
-    let message = b"mensaje encriptado";
 
-    let encrypted = aes::encrypt(&key, &message.to_vec());
-    print!("{:?}", key);
-    let decrypted = aes::decrypt(&key, &encrypted);
 
-    assert_eq!(decrypted.as_slice().len(), message.len());
-}
-/* #[test]
-fn aes_no_save() {
-    use algorithms::aes;
 
-    let key: [u8; 32] = *aes::generate_key().as_ref();
-    println!("{:?}", key);
-    let message = b"mensaje encriptado";
-
-    let encrypted = aes::encrypt(&key, &message.to_vec());
-    let decrypted = aes::decrypt(&key, &encrypted);
-
-    assert_eq!(decrypted.as_slice().len(), message.len());
-} */
 
 /* #[test]
 fn aes_create_keys() {
@@ -85,6 +63,7 @@ fn test_text_encrypt_aes() {
     assert_eq!(original_data, decrypted);
 }
  */
+
 
 
 #[test]
@@ -129,4 +108,4 @@ fn test_text_encrypt_aes() {
     // Verificar que el texto desencriptado sea igual al original
     assert_eq!(original_data, decrypted);
 }
-}
+
