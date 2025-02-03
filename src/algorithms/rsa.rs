@@ -41,6 +41,7 @@ impl RsaKeys {
         RsaPrivateKey::read_pkcs1_pem_file(target)
             .expect("Failed to read private key")
     }
+    
 }
 
 impl Debug for RsaKeys {

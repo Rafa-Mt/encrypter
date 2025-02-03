@@ -4,7 +4,7 @@ use std::env;
 pub enum Action {
     CreateKeys,
     Encrypt(String),
-    Decrypt(String)
+    Decrypt(String, String),
 }
 
 #[derive(Clone, Debug)]
@@ -19,7 +19,8 @@ pub fn parse_args() -> Result<Args, &'static str> {
 
     let actionstring = args.get(1);
     let target = args.get(2);
-    let keyfile = args.get(3);
+    let rsa_key_file = args.get(3);
+    let aes_key_file = args.get (4);
 
 
     if actionstring == None || target == None {
@@ -27,11 +28,36 @@ pub fn parse_args() -> Result<Args, &'static str> {
     }
 
 
+    /* 
+    ENCRIPTACION ( LICITACION, RSAKEY){
+    let data = fs::read(LICITACION).expect("Error al leer README.md");
+    
+
+    let key = aes::generate_key();
+    aes::save_to_file(&key, "AesOut/claveRs.key");
+    let mut data_to_encrypt = data.clone();
+
+    let key_array: [u8; 32] = *key.as_ref();
+    let encrypted = aes::encrypt(&key_array, &mut data_to_encrypt)
+        .expect("Fallo al encriptar los datos");
+    }
+
+
+
+
+
+
+    
+
+
+     */
+
+    
 
 
     let action = match &actionstring.unwrap().to_ascii_lowercase()[..] {
-        "-e" => Action::Encrypt(String::from(keyfile.unwrap())), 
-        "-d" => Action::Decrypt(String::from(keyfile.unwrap())),
+        "-e" => Action::Encrypt(String::from(rsa_key_file.unwrap())), 
+        "-d" => Action::Decrypt(String::from(rsa_key_file.unwrap()),String::from(aes_key_file.unwrap())),
         "-c" => Action::CreateKeys,
         _ => return Err("Invalid action")
     };
