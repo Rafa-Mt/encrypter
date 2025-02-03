@@ -1,24 +1,39 @@
 use super::*;
+use algorithms;
 use ::aes::{cipher::{generic_array::GenericArray, KeyInit}, Aes256};
 
 
 #[test]
-fn full_process_no_save() {
+fn full_rsa() {
+    use algorithms::rsa::{self, RsaKeys};
 
     //crea las llaves en out y un archivo file.txt con el contenido "mensaje encriptado"
-    create_keys("./out");
-
+    let keys= rsa::RsaKeys::new();
+    keys.save_to_file("./out");
     //mensaje encriptado
     let message = b"mensaje encriptado";
 
-    let public_key_path = "./out/public.pem";
-    let private_key_path = "./out/private.pem";
+    let public_key = RsaKeys::read_pubkey("./out/public.pem");
+    let private_key = RsaKeys::read_privkey("./out/private.pem");
 
-    let encrypted = encrypt(&public_key_path, message);
-    let decrypted = decrypt(&private_key_path, &encrypted);
+    let encrypted = rsa::encrypt(&public_key, message);
+    let decrypted = rsa::decrypt(&private_key, &encrypted);
 
     assert_eq!(message, decrypted.as_slice());
+}
 
+#[test]
+fn aes_no_save() {
+    use algorithms::aes;
+    let key = aes::generate_key();
+    let message = b"mensaje encriptado";
+
+    let encrypted = aes::encrypt(&key, &message.to_vec());
+    print!("{:?}", key);
+    let decrypted = aes::decrypt(&key, &encrypted);
+
+    assert_eq!(decrypted.as_slice().len(), message.len());
+}
 /* #[test]
 fn aes_no_save() {
     use algorithms::aes;

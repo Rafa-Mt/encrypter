@@ -1,79 +1,43 @@
-use::rsa::{pkcs1::{DecodeRsaPublicKey, DecodeRsaPrivateKey, EncodeRsaPrivateKey, EncodeRsaPublicKey}, pkcs8::LineEnding, Pkcs1v15Encrypt, RsaPrivateKey, RsaPublicKey };
+
 use std::{fs, io::{Read, Write}, path::Path};
 
+mod algorithms;
 mod args;
 
 fn main() {
-/*     let args = args::parse_args()
-        .expect(&args::get_usage_message());
+    // let args = args::parse_args()
+    //     .expect(&args::get_usage_message());
 
+    // let buffer = if args.action != Action::CreateKeys {
+    //     Some(read_file_to_bytes(&args.target))
+    // } else {
+    //     None
+    // };
 
-    let buffer = if args.action != Action::CreateKeys {
-        Some(read_file_to_bytes(&args.target))
-    } else {
-        None
-    };
+    // let data = match args.action.clone() {
+    //     Action::Encrypt (keystring) =>Some(encrypt(&keystring, &buffer.unwrap().as_slice())),
+    //     Action::Decrypt (keystring) => Some(decrypt(&keystring, &buffer.unwrap().as_slice())),
+    //     Action::CreateKeys => {
+    //         create_keys(&args.target);
+    //         None
+    //     },
+    // };
 
-    let data = match args.action.clone() {
-        Action::Encrypt (keystring) =>Some(encrypt(&keystring, &buffer.unwrap().as_slice())),
-        Action::Decrypt (keystring) => Some(decrypt(&keystring, &buffer.unwrap().as_slice())),
-        Action::CreateKeys => {
-            create_keys(&args.target);
-            None
-        },
-    };
+    // match data {
+    //     None => {},
+    //     Some(data) => {
+    //         let file_extension = match args.action.clone() {
+    //             Action::Encrypt(_) => "bin",
+    //             Action::Decrypt(_) => "txt",
+    //             Action::CreateKeys => panic!("How.")
+    //         };
 
-    match data {
-        None => {},
-        Some(data) => {
-            let file_extension = match args.action.clone() {
-                Action::Encrypt(_) => "bin",
-                Action::Decrypt(_) => "txt",
-                Action::CreateKeys => panic!("How.")
-            };
-
-            fs::File::create(format!("./out.{file_extension}"))
-                .expect("Failed to create output file")
-                .write_all(&data)
-                .expect("Failed to write output file");
-        }
-    } */
-}
-
-fn encrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
-    let public_key = RsaPublicKey::read_pkcs1_pem_file(&keystring)
-    .expect("Failed to read public key");
-    
-
-    let mut rng = rand::thread_rng();
-
-    public_key.encrypt(&mut rng, Pkcs1v15Encrypt, buffer)
-        .expect("Failed to encrypt")
-
-    
-}
-
-fn decrypt(keystring: &str, buffer: &[u8]) -> Vec<u8> {
-    let private_key = RsaPrivateKey::read_pkcs1_pem_file(keystring)
-        .expect("Failed to read private key");  
-    
-    private_key.decrypt(Pkcs1v15Encrypt, buffer)
-        .expect("Failed to decrypt")
-}
-
-fn create_keys(target: &str) {
-    let mut rng = rand::thread_rng();
-    let private_key = RsaPrivateKey::new(&mut rng, 2048)
-        .expect("Failed to generate private key");
-
-
-    let public_key = private_key.to_public_key();
-
-    public_key.write_pkcs1_pem_file(format!("{target}/public.pem"), LineEnding::LF)
-        .expect("Failed to create public key file");
-
-    private_key.write_pkcs1_pem_file(format!("{target}/private.pem"), LineEnding::LF)
-        .expect("Failed to create private key file");
+    //         fs::File::create(format!("./out.{file_extension}"))
+    //             .expect("Failed to create output file")
+    //             .write_all(&data)
+    //             .expect("Failed to write output file");
+    //     }
+    // }
 }
 
 fn read_file_to_bytes(file_path: &str) -> Vec<u8> {
