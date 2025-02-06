@@ -3,7 +3,7 @@ use std::{fs, io::{Read, Write}, path::Path};
 
 mod algorithms;
 mod args;
-use algorithms::{aes, rsa::{self, RsaKeys}};
+use algorithms::{aes, rsa::{self, save_to_file, RsaKeys}};
 use args::Action;
 
 fn main() {
@@ -12,7 +12,7 @@ fn main() {
 
 
 
-    let mut buffer = if args.action != Action::CreateKeys {
+    let buffer = if args.action != Action::CreateKeys && !matches!(args.action, Action::ClonePubKey(_)) {
         Some(read_file_to_bytes(&args.target))
     } else {
         None
@@ -57,6 +57,13 @@ fn main() {
             RsaKeys::new().save_to_file(&args.target);
             None
         },
+        Action::ClonePubKey (rsa_key_path) => {
+            let private_key = RsaKeys::read_privkey(&rsa_key_path);
+            let public_key = private_key.to_public_key();
+            save_to_file(&public_key, &args.target);
+            None
+
+        }
     };
 
     match data {
@@ -65,7 +72,8 @@ fn main() {
             let file_extension = match args.action.clone() {
                 Action::Encrypt(_) => "bin",
                 Action::Decrypt(_,_) => "txt",
-                Action::CreateKeys => panic!("How.")
+                Action::CreateKeys => panic!("How."),
+                Action::ClonePubKey(_) =>  panic!("How.x2")
             };
 
             fs::File::create(format!("./out.{file_extension}"))

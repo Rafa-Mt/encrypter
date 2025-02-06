@@ -22,50 +22,6 @@ fn full_rsa() {
     assert_eq!(message, decrypted.as_slice());
 }
 
-
-
-
-
-/* #[test]
-fn aes_create_keys() {
-    use algorithms::aes;
-    let key = aes::generate_key();
-    aes::save_to_file(&key, "AesOut/claveRs.key");
-} */
-
-/* #[test]
-fn test_text_encrypt_aes() {
-    use algorithms::aes;
-    // Leer el contenido original de "README.md"
-    let original_data = fs::read("README.md").expect("Error al leer README.md");
-    
-    // Generar la clave AES de 256 bits
-    let key = aes::generate_key();
-    
-    // Clonar los datos para encriptarlos
-    let mut data_to_encrypt = original_data.clone();
-    
-    // Encriptar los datos
-    let key_array: [u8; 32] = *key.as_ref();
-    let encrypted = aes::encrypt(&key_array, &mut data_to_encrypt)
-        .expect("Fallo al encriptar los datos");
-    
-    // Asegurarse de que el ciphertext difiera (después del IV) del contenido original
-    // Se omite el IV (primeros 16 bytes) para la comparación
-    assert_ne!(&encrypted[16..], &original_data[..std::cmp::min(original_data.len(), encrypted.len()-16)]);
-    
-    // Desencriptar los datos
-    let key_array: [u8; 32] = *key.as_ref();
-    let decrypted = aes::decrypt(&key_array, &encrypted)
-        .expect("Fallo al desencriptar los datos");
-    
-    // Verificar que el texto desencriptado sea igual al original
-    assert_eq!(original_data, decrypted);
-}
- */
-
-
-
 #[test]
 fn test_text_encrypt_aes() {
     use std::fs;
@@ -77,7 +33,7 @@ fn test_text_encrypt_aes() {
     
     // Generar la clave AES de 256 bits
     let key = aes::generate_key();
-    aes::save_to_file(&key, "AesOut/claveRs.key");
+
     
     // Clonar los datos para encriptarlos
     let mut data_to_encrypt = original_data.clone();

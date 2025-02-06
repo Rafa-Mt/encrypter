@@ -32,6 +32,7 @@ impl RsaKeys {
             .expect("Failed to write private key");
     }
 
+
     pub fn read_pubkey(target: &str) -> RsaPublicKey {
         RsaPublicKey::read_pkcs1_pem_file(target)
             .expect("Failed to read public key")
@@ -41,6 +42,8 @@ impl RsaKeys {
         RsaPrivateKey::read_pkcs1_pem_file(target)
             .expect("Failed to read private key")
     }
+
+
     
 }
 
@@ -61,3 +64,14 @@ pub fn decrypt(private_key: &RsaPrivateKey, buffer: &[u8]) -> Vec<u8> {
     private_key.decrypt(Pkcs1v15Encrypt, buffer)
         .expect("Failed to decrypt")
 }
+
+pub fn generate_key(private_key:&RsaPrivateKey) ->  RsaPublicKey {
+    private_key.to_public_key()
+}
+
+pub fn save_to_file(public_key: &RsaPublicKey, target: &str) {
+    public_key.write_pkcs1_pem_file(&format!("{}/public.pem", target), LineEnding::LF)
+        .expect("Failed to write public key");
+}
+
+

@@ -1,4 +1,4 @@
-use std::{fs::File, io::Write, path::Path};
+//use std::{fs::File, io::Write, path::Path};
 use aes::Aes256;
 use aes::cipher::{
     BlockEncrypt, BlockDecrypt, KeyInit,
@@ -6,7 +6,7 @@ use aes::cipher::{
 };
 use rand::rngs::OsRng;
 use rand::RngCore;
-use rand::Rng;
+//use rand::Rng;
 
 /// Encripta los datos usando AES-256 en modo CBC con relleno PKCS7.
 /// Genera un IV aleatorio, encripta los datos y devuelve el IV concatenado con el texto cifrado.
@@ -17,15 +17,24 @@ pub fn encrypt(key: &[u8; 32], data: &mut Vec<u8>) -> Result<Vec<u8>, Box<dyn st
     data.extend(std::iter::repeat(pad_len as u8).take(pad_len));
 
     // Generar un IV aleatorio
-    let mut rng = rand::thread_rng();
+/*     let mut rng = rand::thread_rng();
     let mut iv = [0u8; 16];
     rng.fill(&mut iv);
+ */
+
+    let iv = [0x57, 0x53, 0x9d, 0xf8, 0x4d, 0x2a, 0x6b, 0x15, 0xcd, 0x0c, 0xd2, 0xdb, 0x11, 0x09, 0xdd, 0x07];
 
     // Instanciar el cifrador AES-256 en modo ECB (usado internamente)
     let cipher = Aes256::new(GenericArray::from_slice(key));
 
+
     let mut prev = iv; // En CBC, el IV se usa como "bloque anterior" para el primer bloque
-    let mut result = iv.to_vec(); // Prependemos el IV al resultado
+    
+    
+    let mut ciphertext = Vec::new(); // Guardará el mensaje encriptado sin el IV
+    
+
+
 
     // Procesar cada bloque de 16 bytes
     for chunk in data.chunks(block_size) {
@@ -35,13 +44,21 @@ pub fn encrypt(key: &[u8; 32], data: &mut Vec<u8>) -> Result<Vec<u8>, Box<dyn st
         for i in 0..block_size {
             block[i] ^= prev[i];
         }
-        // Encriptar el bloque: se usa el modo ECB 
+        // Encriptar el bloque: se usa el modo ECB
         let mut block_ga = GenericArray::clone_from_slice(&block);
         cipher.encrypt_block(&mut block_ga);
-        // El bloque encriptado se guarda como el nuevo "prev" y se añade al resultado
+        // Actualizar prev y almacenar el bloque encriptado
         prev.copy_from_slice(&block_ga);
-        result.extend_from_slice(&block_ga);
+        ciphertext.extend_from_slice(&block_ga);
     }
+
+    println!("IV: {:02x?}", iv);
+    println!("Mensaje encriptado: {:02x?}", ciphertext);
+
+    let mut result = iv.to_vec();
+    result.extend_from_slice(&ciphertext);
+    println!("Resultado: {:02x?}", result);
+    
 
     Ok(result)
 }
@@ -91,16 +108,18 @@ pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, Box<dyn std::erro
         plaintext.truncate(plaintext.len() - pad_len);
     }
 
+    
+
     Ok(plaintext)
 }
 
-pub fn save_to_file(key: &GenericArray<u8, U32>, target: &str) {
+/* pub fn save_to_file(key: &GenericArray<u8, U32>, target: &str) {
     let path =Path::new(target);
     // Guardar la clave en un archivo .key
     let mut file = File::create(path).expect("No se pudo crear el archivo");
     file.write_all(&key).expect("No se pudo escribir en el archivo");
 } 
-
+ */
 pub fn generate_key() -> GenericArray<u8, U32> {
     let mut key  = [0u8; 32];
     let mut rng = OsRng;
